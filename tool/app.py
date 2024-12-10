@@ -25,4 +25,6 @@ def correct_text(input_text):
     except openai.error.RateLimitError:
         raise ValueError("Quota dépassé. Vérifiez vos limites d'utilisation.")
     except openai.error.OpenAIError as e:
-        raise ValueError(f"Une erreur OpenAI s'est produite : {e}")
+        raise ValueError(f"Erreur OpenAI : {str(e)}")
+    except Exception as e:
+        raise ValueError(f"Une erreur inattendue s'est produite : {str(e)}")
