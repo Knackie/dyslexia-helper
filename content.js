@@ -1,43 +1,30 @@
-// Charger le dictionnaire
-let dictionary = {};
-
-fetch(chrome.runtime.getURL("dictionary.json"))
-  .then((response) => response.json())
-  .then((data) => {
-    dictionary = data;
+// Contenu principal pour OpenAI
+async function correctText(text) {
+  const apiKey = await chrome.storage.local.get("openai_api_key");
+  const response = await fetch("https://api.openai.com/v1/completions", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${apiKey.openai_api_key}`,
+    },
+    body: JSON.stringify({
+      model: "text-davinci-003",
+      prompt: `Corrige les fautes grammaticales et orthographiques dans ce texte: "${text}"`,
+      max_tokens: 1000,
+    }),
   });
 
-function isCorrectWord(word) {
-  return dictionary.hasOwnProperty(word.toLowerCase());
-}
-
-function getSuggestions(word) {
-  return Object.keys(dictionary).filter((dictWord) => {
-    return dictWord.startsWith(word[0]);
-  });
-}
-
-function correctText(text) {
-  const words = text.split(" ");
-  let corrected = "";
-  words.forEach((word) => {
-    if (!isCorrectWord(word)) {
-      const suggestions = getSuggestions(word);
-      corrected += suggestions.length > 0 ? suggestions[0] : word;
-    } else {
-      corrected += word;
-    }
-    corrected += " ";
-  });
-  return corrected.trim();
+  const data = await response.json();
+  return data.choices[0].text.trim();
 }
 
 chrome.storage.local.get("active", ({ active }) => {
   if (active) {
     document.querySelectorAll("textarea, input[type='text']").forEach((field) => {
-      field.addEventListener("input", (event) => {
-        const corrected = correctText(event.target.value);
-        event.target.value = corrected;
+      field.addEventListener("blur", async (event) => {
+        const originalText = event.target.value;
+        const correctedText = await correctText(originalText);
+        event.target.value = correctedText;
       });
     });
   }

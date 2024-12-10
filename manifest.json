@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Correcteur Dyslexique",
+  "name": "Correcteur Dyslexique OpenAI",
   "version": "1.0",
-  "description": "Corrige les fautes de frappe et de grammaire dans les zones de texte.",
+  "description": "Corrige les fautes de frappe et de grammaire dans les zones de texte via OpenAI API.",
   "permissions": ["activeTab", "storage"],
   "host_permissions": ["<all_urls>"],
   "action": {
