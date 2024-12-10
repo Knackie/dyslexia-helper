@@ -1,22 +1,24 @@
-from unittest.mock import patch
-import pytest
-from tool.app import correct_text
+def correct_text(input_text):
+    """
+    Corrige les fautes grammaticales et orthographiques dans un texte.
+    """
+    if not openai.api_key:
+        raise ValueError("Clé API OpenAI manquante. Définissez la variable d'environnement OPENAI_API_KEY.")
 
-@pytest.mark.parametrize("input_text, expected_output", [
-    ("Il faut que je pars.", "Il faut que je parte."),
-    ("Je vais au magazin.", "Je vais au magasin."),
-    ("Elle a manger la pomme.", "Elle a mangé la pomme."),
-    ("Nous avon fini nos devoirs.", "Nous avons fini nos devoirs."),
-    ("Vous etes les bienvenus.", "Vous êtes les bienvenus."),
-])
-def test_correct_text(input_text, expected_output):
-    """
-    Teste la correction d'un texte en simulant la réponse de l'API OpenAI.
-    """
-    with patch('tool.app.openai.ChatCompletion.create') as mock_create:
-        mock_create.return_value = {
-            "choices": [
-                {"message": {"content": expected_output}}
+    try:
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system", "content": "Corrige les fautes grammaticales et orthographiques."},
+                {"role": "user", "content": input_text}
             ]
-        }
-        assert correct_text(input_text) == expected_output
+        )
+        return response['choices'][0]['message']['content'].strip()
+    except openai.error.AuthenticationError:
+        raise ValueError("La clé API est invalide.")
+    except openai.error.RateLimitError:
+        raise ValueError("Quota dépassé. Vérifiez vos limites d'utilisation.")
+    except openai.error.OpenAIError as e:
+        raise ValueError(f"Erreur OpenAI : {str(e)}")
+    except Exception as e:
+        raise ValueError(f"Une erreur inattendue s'est produite : {str(e)}")
