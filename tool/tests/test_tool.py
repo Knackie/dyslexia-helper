@@ -6,11 +6,10 @@ def test_correct_text_missing_api_key():
     """
     Teste le cas où la clé API est absente.
     """
-    # Simulez l'absence de clé API
-    with patch('os.getenv', return_value=None):
+    # Simulez l'absence de clé API en patchant `os.getenv` et `openai.api_key`
+    with patch('os.getenv', return_value=None), patch('tool.app.openai.api_key', None):
         with pytest.raises(ValueError, match="Clé API OpenAI manquante"):
             correct_text("Texte d'exemple")
-
 
 # Test : Clé API invalide
 def test_correct_text_invalid_api_key():
