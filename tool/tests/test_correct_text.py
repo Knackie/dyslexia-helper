@@ -1,4 +1,4 @@
-import os
+from unittest.mock import patch
 import pytest
 from tool.app import correct_text
 
@@ -10,4 +10,10 @@ from tool.app import correct_text
     ("Vous etes les bienvenus.", "Vous êtes les bienvenus."),
 ])
 def test_correct_text(input_text, expected_output):
-    assert correct_text(input_text) == expected_output
+    with patch('tool.app.openai.ChatCompletion.create') as mock_create:
+        mock_create.return_value = {
+            "choices": [
+                {"message": {"content": expected_output}}
+            ]
+        }
+        assert correct_text(input_text) == expected_output
