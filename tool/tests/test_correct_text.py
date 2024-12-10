@@ -10,6 +10,9 @@ from tool.app import correct_text
     ("Vous etes les bienvenus.", "Vous êtes les bienvenus."),
 ])
 def test_correct_text(input_text, expected_output):
+    """
+    Teste la correction d'un texte en simulant la réponse de l'API OpenAI.
+    """
     with patch('tool.app.openai.ChatCompletion.create') as mock_create:
         mock_create.return_value = {
             "choices": [

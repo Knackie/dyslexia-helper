@@ -11,11 +11,18 @@ def correct_text(input_text):
     if not openai.api_key:
         raise ValueError("Clé API OpenAI manquante. Définissez la variable d'environnement OPENAI_API_KEY.")
 
-    response = openai.Completion.create(
-        model="gpt-3.5-turbo",
-        prompt=f"Corrige les fautes grammaticales et orthographiques dans ce texte : {input_text}",
-        max_tokens=100
-    )
-
-    corrected_text = response['choices'][0]['text'].strip()
-    return corrected_text
+    try:
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system", "content": "Corrige les fautes grammaticales et orthographiques."},
+                {"role": "user", "content": input_text}
+            ]
+        )
+        return response['choices'][0]['message']['content'].strip()
+    except openai.error.AuthenticationError:
+        raise ValueError("La clé API est invalide.")
+    except openai.error.RateLimitError:
+        raise ValueError("Quota dépassé. Vérifiez vos limites d'utilisation.")
+    except openai.error.OpenAIError as e:
+        raise ValueError(f"Une erreur OpenAI s'est produite : {e}")
