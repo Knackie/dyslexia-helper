@@ -12,7 +12,7 @@ def correct_text(input_text):
         raise ValueError("Clé API OpenAI manquante. Définissez la variable d'environnement OPENAI_API_KEY.")
 
     response = openai.Completion.create(
-        model="text-davinci-003",
+        model="gpt-3.5-turbo",
         prompt=f"Corrige les fautes grammaticales et orthographiques dans ce texte : {input_text}",
         max_tokens=100
     )
