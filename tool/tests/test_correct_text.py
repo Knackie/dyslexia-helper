@@ -1,8 +1,15 @@
+import os
+import openai
+
+# Configurez la clé API OpenAI
+openai.api_key = os.getenv("OPENAI_API_KEY")
+
 def correct_text(input_text):
     """
     Corrige les fautes grammaticales et orthographiques dans un texte.
     """
-    if not openai.api_key:
+    api_key = os.getenv("OPENAI_API_KEY")
+    if not api_key:
         raise ValueError("Clé API OpenAI manquante. Définissez la variable d'environnement OPENAI_API_KEY.")
 
     try:
